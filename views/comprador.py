@@ -7,79 +7,109 @@ def init_cart():
 
 def add_to_cart(producto, precio):
     st.session_state.carrito.append({"producto": producto, "precio": precio})
-    st.toast(f"✅ {producto} agregado al carrito")
+    st.toast(f"✅ Agregaste {producto}", icon="🛒")
 
 def render():
     init_cart()
-    st.title("🛒 Pedidos EAFIT")
     
-    # Alerta visual basada en los datos de la presentación
-    st.info("🕒 Recuerda: Las franjas de mayor congestión en el campus son de 9:00 - 11:00 a.m. y de 12:00 - 2:00 p.m. ¡Pide con anticipación para evitar filas!")
+    # Inyección de CSS para redondear bordes y simular app móvil
+    st.markdown("""
+        <style>
+        .stButton>button {
+            border-radius: 20px;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        div[data-testid="stImage"] img {
+            border-radius: 15px;
+            object-fit: cover;
+        }
+        div[data-testid="stMetricValue"] {
+            font-size: 1.2rem;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # Cabecera tipo App
+    st.subheader("👋 Hola, ¿Qué vas a pedir hoy?")
+    st.caption("📍 Entregar en: Campus Universitario")
     
-    # Base de datos simulada con los restaurantes reales del campus
+    # Navegación rápida por categorías (Chips)
+    st.write("**Categorías Rápidas**")
+    cat1, cat2, cat3, cat4 = st.columns(4)
+    cat1.button("🔥 Promos", use_container_width=True)
+    cat2.button("🍔 Burgers", use_container_width=True)
+    cat3.button("🥗 Sano", use_container_width=True)
+    cat4.button("☕ Café", use_container_width=True)
+
+    st.divider()
+
+    # Base de datos simulada con URLs de imágenes de prueba
     datos_menu = pd.DataFrame({
         "Restaurante": ["Nikkei Village", "Frisby", "Subway", "The Corral", "Juan Valdez", "Bigo's", "Nativos"],
         "Plato": ["Sushi Roll 10pz", "Combo Frisby", "Sub del Día", "Hamburguesa Todoterreno", "Latte Frio", "Papas Fritas", "Bowl de Acai"],
         "Precio": [22000, 25000, 18000, 28000, 8500, 5000, 14000],
         "Tiempo Prep (min)": [15, 10, 8, 12, 5, 5, 5],
-        "Abierto_Finde": [True, True, False, True, True, True, False]
+        "Imagen": [
+            "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&q=80",
+            "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400&q=80",
+            "https://images.unsplash.com/photo-1616075677936-391490218731?w=400&q=80",
+            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80",
+            "https://images.unsplash.com/photo-1461023058943-0708e5f23a54?w=400&q=80",
+            "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=400&q=80",
+            "https://images.unsplash.com/photo-1494597564530-871f2b93ac55?w=400&q=80"
+        ]
     })
 
-    # Filtros dinámicos
-    with st.expander("🔍 Filtrar Opciones", expanded=True):
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            filtro_restaurante = st.multiselect("Restaurante", datos_menu["Restaurante"].unique())
-        with col2:
-            filtro_tiempo = st.slider("Tiempo máximo de espera (min)", 5, 30, 15)
-        with col3:
-            solo_finde = st.checkbox("Solo abiertos fin de semana")
+    st.markdown("### 🏪 Restaurantes Destacados")
 
-    # Aplicar filtros
-    df_filtrado = datos_menu[datos_menu["Tiempo Prep (min)"] <= filtro_tiempo]
-    if filtro_restaurante:
-        df_filtrado = df_filtrado[df_filtrado["Restaurante"].isin(filtro_restaurante)]
-    if solo_finde:
-        df_filtrado = df_filtrado[df_filtrado["Abierto_Finde"] == True]
+    # Renderizado en formato de Tarjetas (Cards)
+    for idx, row in datos_menu.iterrows():
+        # Usamos contenedores para agrupar imagen y texto
+        with st.container():
+            col_img, col_info, col_btn = st.columns([1.5, 3, 1.2])
+            
+            with col_img:
+                st.image(row["Imagen"], use_container_width=True)
+                
+            with col_info:
+                st.markdown(f"**{row['Plato']}**")
+                st.caption(f"🏪 {row['Restaurante']} • ⭐ 4.8")
+                st.caption(f"🛵 {row['Tiempo Prep (min)']} - {row['Tiempo Prep (min)'] + 5} min")
+                
+            with col_btn:
+                st.write(f"**${row['Precio']:,}**")
+                st.button("Agregar", key=f"btn_{idx}", on_click=add_to_cart, args=(row['Plato'], row['Precio']), type="primary", use_container_width=True)
+        st.markdown("---")
 
-    # Catálogo
-    st.markdown("### Menú Disponible")
-    for idx, row in df_filtrado.iterrows():
-        c1, c2, c3 = st.columns([3, 1, 1])
-        with c1:
-            st.write(f"**{row['Plato']}** ({row['Restaurante']})")
-            st.caption(f"⏱️ {row['Tiempo Prep (min)']} min de preparación")
-        with c2:
-            st.write(f"${row['Precio']:,}")
-        with c3:
-            st.button("Agregar", key=f"btn_{idx}", on_click=add_to_cart, args=(row['Plato'], row['Precio']))
-        st.divider()
-
-    # Módulo de Checkout y Validación de Negocio
+    # Módulo de Checkout Flotante (Sidebar)
     if st.session_state.carrito:
-        st.sidebar.markdown("---")
-        st.sidebar.subheader("Tu Pedido")
+        st.sidebar.markdown("### 🛒 Tu Canasta")
         
         subtotal = sum(item["precio"] for item in st.session_state.carrito)
-        recargo_servicio = 1500 # Validando disposición de pago
+        recargo_servicio = 1500 
         total = subtotal + recargo_servicio
 
         for i, item in enumerate(st.session_state.carrito):
-            st.sidebar.text(f"1x {item['producto']} - ${item['precio']:,}")
+            col_item, col_price = st.sidebar.columns([3, 1])
+            col_item.text(f"1x {item['producto']}")
+            col_price.text(f"${item['precio']:,}")
             
-        st.sidebar.markdown(f"**Subtotal:** ${subtotal:,}")
-        st.sidebar.markdown(f"**Costo por servicio (App):** ${recargo_servicio:,}")
-        st.sidebar.markdown(f"### Total: ${total:,}")
+        st.sidebar.divider()
+        st.sidebar.markdown(f"Costo de productos: **${subtotal:,}**")
+        st.sidebar.markdown(f"Tarifa de servicio: **${recargo_servicio:,}**")
+        st.sidebar.subheader(f"Total: ${total:,}")
 
-        franja = st.sidebar.time_input("Hora de recogida")
-        metodo_pago = st.sidebar.selectbox("Método de Pago", [
-            "Descuento por Nómina EAFIT", 
-            "Pago con Carné (Saldo)", 
-            "Pasarela (Tarjeta/PSE)", 
-            "Efectivo en punto"
+        franja = st.sidebar.time_input("🕐 ¿A qué hora pasas?")
+        metodo_pago = st.sidebar.selectbox("💳 Método de Pago", [
+            "Descuento Nómina EAFIT", 
+            "Saldo Carné", 
+            "Apple Pay / Tarjeta", 
+            "Efectivo"
         ])
 
-        if st.sidebar.button("Pagar y Confirmar Pedido", use_container_width=True):
-            st.sidebar.success("¡Pedido confirmado! El restaurante ya recibió tu comanda.")
+        if st.sidebar.button("Hacer Pedido", use_container_width=True, type="primary"):
+            st.sidebar.success("🎉 ¡Tu pedido está en camino a la cocina!")
             st.session_state.carrito.clear()
             st.rerun()
