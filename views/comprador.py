@@ -13,13 +13,16 @@ def render():
     init_cart()
     st.title("🛒 Pedidos EAFIT")
     
-    # Simulación de datos (a reemplazar con GET a Google Sheets)
+    # Alerta visual basada en los datos de la presentación
+    st.info("🕒 Recuerda: Las franjas de mayor congestión en el campus son de 9:00 - 11:00 a.m. y de 12:00 - 2:00 p.m. ¡Pide con anticipación para evitar filas!")
+    
+    # Base de datos simulada con los restaurantes reales del campus
     datos_menu = pd.DataFrame({
-        "Restaurante": ["Bigo's", "Bigo's", "Subway", "Nikkei"],
-        "Plato": ["Hamburguesa Sencilla", "Papas Fritas", "Combo del Día", "Sushi Roll"],
-        "Precio": [15000, 5000, 18000, 22000],
-        "Tiempo Prep (min)": [10, 5, 8, 15],
-        "Abierto_Finde": [True, True, False, True]
+        "Restaurante": ["Nikkei Village", "Frisby", "Subway", "The Corral", "Juan Valdez", "Bigo's", "Nativos"],
+        "Plato": ["Sushi Roll 10pz", "Combo Frisby", "Sub del Día", "Hamburguesa Todoterreno", "Latte Frio", "Papas Fritas", "Bowl de Acai"],
+        "Precio": [22000, 25000, 18000, 28000, 8500, 5000, 14000],
+        "Tiempo Prep (min)": [15, 10, 8, 12, 5, 5, 5],
+        "Abierto_Finde": [True, True, False, True, True, True, False]
     })
 
     # Filtros dinámicos
@@ -77,7 +80,6 @@ def render():
         ])
 
         if st.sidebar.button("Pagar y Confirmar Pedido", use_container_width=True):
-            # Aquí iría el POST a Google Sheets
             st.sidebar.success("¡Pedido confirmado! El restaurante ya recibió tu comanda.")
             st.session_state.carrito.clear()
             st.rerun()
