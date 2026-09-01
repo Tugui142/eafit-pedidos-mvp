@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Inyección silenciosa del contenedor de Tag Manager usando la sintaxis actual
+# Inyección del contenedor de Tag Manager
 st.html(
     """
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -20,7 +20,7 @@ st.html(
     """
 )
 
-# Navegación principal (Línea corregida)
+# Navegación principal
 st.sidebar.image("https://via.placeholder.com/150x50?text=Logo+EAFIT", use_container_width=True)
 st.sidebar.title("Navegación")
 modulo = st.sidebar.radio("Selecciona tu perfil:", ["Comprador", "Vendedor (Restaurante)"])
