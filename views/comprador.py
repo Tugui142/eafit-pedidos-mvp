@@ -12,21 +12,24 @@ def add_to_cart(producto, precio):
 def render():
     init_cart()
     
-    # Inyección de CSS para redondear bordes y simular app móvil
+    # Inyección de CSS para simular wireframe / prototipo de media fidelidad
     st.markdown("""
         <style>
         .stButton>button {
-            border-radius: 20px;
+            border-radius: 6px;
             font-weight: 600;
-            border: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #333333;
+            color: white;
+            border: 1px solid #222;
+        }
+        .stButton>button:hover {
+            background-color: #555555;
+            color: white;
         }
         div[data-testid="stImage"] img {
-            border-radius: 15px;
+            border-radius: 8px;
             object-fit: cover;
-        }
-        div[data-testid="stMetricValue"] {
-            font-size: 1.2rem;
+            filter: grayscale(100%); /* Efecto boceto/escala de grises en imágenes */
         }
         </style>
     """, unsafe_allow_html=True)
@@ -37,7 +40,7 @@ def render():
 
     st.divider()
 
-    # Base de datos simulada con URLs de imágenes de prueba
+    # Base de datos simulada con URLs de imágenes
     datos_menu = pd.DataFrame({
         "Restaurante": ["Nikkei Village", "Frisby", "Subway", "The Corral", "Juan Valdez", "Bigo's", "Nativos"],
         "Plato": ["Sushi Roll 10pz", "Combo Frisby", "Sub del Día", "Hamburguesa Todoterreno", "Latte Frio", "Papas Fritas", "Bowl de Acai"],
@@ -56,7 +59,7 @@ def render():
 
     st.markdown("### 🏪 Restaurantes Destacados")
 
-    # Renderizado en formato de Tarjetas (Cards)
+    # Renderizado en formato de Tarjetas (Cards) estilo wireframe
     for idx, row in datos_menu.iterrows():
         with st.container():
             col_img, col_info, col_btn = st.columns([1.5, 3, 1.2])
@@ -67,11 +70,11 @@ def render():
             with col_info:
                 st.markdown(f"**{row['Plato']}**")
                 st.caption(f"🏪 {row['Restaurante']} • ⭐ 4.8")
-                st.caption(f"🛵 {row['Tiempo Prep (min)']} - {row['Tiempo Prep (min)'] + 5} min")
+                st.caption(f"⏱️ {row['Tiempo Prep (min\")} min")
                 
             with col_btn:
                 st.write(f"**${row['Precio']:,}**")
-                st.button("Agregar", key=f"btn_{idx}", on_click=add_to_cart, args=(row['Plato'], row['Precio']), type="primary", use_container_width=True)
+                st.button("Agregar", key=f"btn_{idx}", on_click=add_to_cart, args=(row['Plato'], row['Precio']), use_container_width=True)
         st.markdown("---")
 
     # Módulo de Checkout Flotante (Sidebar)
@@ -100,7 +103,7 @@ def render():
             "Efectivo"
         ])
 
-        if st.sidebar.button("Hacer Pedido", use_container_width=True, type="primary"):
+        if st.sidebar.button("Hacer Pedido", use_container_width=True):
             st.sidebar.success("🎉 ¡Tu pedido está en camino a la cocina!")
             st.session_state.carrito.clear()
             st.rerun()
