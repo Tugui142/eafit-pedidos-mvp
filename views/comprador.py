@@ -34,14 +34,6 @@ def render():
     # Cabecera tipo App
     st.subheader("👋 Hola, ¿Qué vas a pedir hoy?")
     st.caption("📍 Entregar en: Campus Universitario")
-    
-    # Navegación rápida por categorías (Chips)
-    st.write("**Categorías Rápidas**")
-    cat1, cat2, cat3, cat4 = st.columns(4)
-    cat1.button("🔥 Promos", use_container_width=True)
-    cat2.button("🍔 Burgers", use_container_width=True)
-    cat3.button("🥗 Sano", use_container_width=True)
-    cat4.button("☕ Café", use_container_width=True)
 
     st.divider()
 
@@ -66,7 +58,6 @@ def render():
 
     # Renderizado en formato de Tarjetas (Cards)
     for idx, row in datos_menu.iterrows():
-        # Usamos contenedores para agrupar imagen y texto
         with st.container():
             col_img, col_info, col_btn = st.columns([1.5, 3, 1.2])
             
